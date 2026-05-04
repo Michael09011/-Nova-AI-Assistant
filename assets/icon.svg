@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#007AFF" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#2F4EFF" stop-opacity="0.85"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#007AFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blurGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="28" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="260" fill="url(#bgGradient)"/>
+  <circle cx="512" cy="512" r="420" fill="url(#glow)" filter="url(#blurGlow)"/>
+  <path d="M408 180 L638 180 L490 504 L660 504 L358 844 L426 530 L408 180 Z" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M426 196 L598 196 L486 458 L602 458 L392 756 L452 502 L426 196 Z" fill="#81C4FF" opacity="0.9"/>
+  <path d="M451 282 L574 282 L482 472 L576 472 L446 725 L478 544 L451 282 Z" fill="#EAF5FF" opacity="0.85"/>
+</svg>

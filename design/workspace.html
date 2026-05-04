@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Nova AI - Workspace</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0058bc",
+            "on-background": "#1a1c1d",
+            "surface": "#f9f9fb",
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .sidebar-item {
+      transition: all 0.2s ease;
+    }
+    .sidebar-item:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    .sidebar-item.active {
+      background: rgba(0, 88, 188, 0.1);
+      border-right: 3px solid #0058bc;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-background">
+  <!-- Header -->
+  <header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-3 bg-white/60 backdrop-blur-2xl border-b border-white/30">
+    <div class="flex items-center gap-8">
+      <span class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500">Nova AI</span>
+      <nav class="hidden md:flex items-center gap-6">
+        <a class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors" href="Dashboard.html">Dashboard</a>
+        <a class="text-sm font-medium text-primary" href="#">Workspace</a>
+        <a class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors" href="#">Library</a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-4">
+      <button class="p-2 hover:bg-white/40 rounded-lg transition-colors" onclick="location.href='setting.html'">
+        <span class="material-symbols-outlined text-slate-600">settings</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="flex h-screen pt-16">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white/40 backdrop-blur border-r border-white/30 flex flex-col overflow-hidden">
+      <!-- Create New Project -->
+      <div class="p-4 border-b border-white/20">
+        <button onclick="createNewProject()" class="w-full bg-primary text-white rounded-lg py-2 px-4 flex items-center justify-center gap-2 hover:opacity-90 transition-all text-sm font-medium">
+          <span class="material-symbols-outlined text-lg">add</span>
+          새 프로젝트
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="p-4 border-b border-white/20">
+        <div class="relative">
+          <input type="text" id="search-input" class="w-full bg-white/60 border border-white/40 rounded-lg px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="검색..." onkeyup="filterProjects()" />
+          <span class="material-symbols-outlined absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg">search</span>
+        </div>
+      </div>
+
+      <!-- Projects List -->
+      <div class="flex-1 overflow-y-auto">
+        <div class="p-2 space-y-1">
+          <!-- Favorites Section -->
+          <div class="px-2 py-1">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">즐겨찾기</p>
+            <div id="favorites-container" class="space-y-1">
+              <!-- Favorites will be populated here -->
+            </div>
+          </div>
+
+          <!-- Recent Section -->
+          <div class="px-2 py-3 border-t border-white/20">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">최근</p>
+            <div id="recent-container" class="space-y-1">
+              <!-- Recent projects will be populated here -->
+            </div>
+          </div>
+
+          <!-- All Projects Section -->
+          <div class="px-2 py-3 border-t border-white/20">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">모든 프로젝트</p>
+            <div id="projects-container" class="space-y-1">
+              <!-- Projects will be populated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Storage Info -->
+      <div class="p-4 border-t border-white/20 bg-white/20">
+        <div class="text-xs text-slate-600 mb-2">저장소 사용량</div>
+        <div class="w-full bg-white/40 rounded-full h-2 overflow-hidden">
+          <div class="bg-primary h-full" style="width: 35%"></div>
+        </div>
+        <div class="text-xs text-slate-500 mt-2">3.5 GB / 10 GB</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-8">
+      <div id="content-area">
+        <!-- Project Detail or Empty State -->
+        <div id="empty-state" class="flex items-center justify-center h-full">
+          <div class="text-center space-y-4">
+            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-blue-100">
+              <span class="material-symbols-outlined text-5xl text-primary">folder_open</span>
+            </div>
+            <h2 class="text-2xl font-bold text-on-background">프로젝트를 선택하세요</h2>
+            <p class="text-slate-500 max-w-md">왼쪽 사이드바에서 프로젝트를 선택하거나 새 프로젝트를 생성하세요.</p>
+            <button onclick="createNewProject()" class="mt-6 bg-primary text-white rounded-lg py-2 px-6 hover:opacity-90 transition-all inline-flex items-center gap-2">
+              <span class="material-symbols-outlined">add</span>
+              새 프로젝트 생성
+            </button>
+          </div>
+        </div>
+
+        <!-- Project Detail Panel -->
+        <div id="project-detail" class="hidden space-y-6">
+          <div class="glass-card rounded-2xl p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <h1 class="text-3xl font-bold text-on-background mb-2" id="project-name"></h1>
+                <p class="text-slate-600" id="project-desc"></p>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="toggleFavorite()" class="p-2 hover:bg-white/40 rounded-lg transition-colors" id="favorite-btn">
+                  <span class="material-symbols-outlined" id="favorite-icon">star</span>
+                </button>
+                <button onclick="deleteProject()" class="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
+              <div>
+                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">생성일</p>
+                <p class="text-sm font-medium mt-1" id="project-created"></p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">마지막 수정</p>
+                <p class="text-sm font-medium mt-1" id="project-modified"></p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">파일 수</p>
+                <p class="text-sm font-medium mt-1" id="project-files"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat History -->
+          <div class="glass-card rounded-2xl p-6">
+            <h2 class="text-xl font-bold text-on-background mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined">chat</span>
+              채팅 히스토리
+            </h2>
+            <div id="chat-history" class="space-y-2">
+              <!-- Chat history will be populated here -->
+            </div>
+          </div>
+
+          <!-- Related Files -->
+          <div class="glass-card rounded-2xl p-6">
+            <h2 class="text-xl font-bold text-on-background mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined">description</span>
+              관련 파일
+            </h2>
+            <div id="related-files" class="space-y-2">
+              <!-- Files will be populated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- New Project Modal -->
+  <div id="project-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+    <div class="glass-card rounded-2xl p-6 w-96 space-y-4">
+      <h2 class="text-2xl font-bold text-on-background">새 프로젝트</h2>
+      
+      <div>
+        <label class="block text-sm font-medium text-on-background mb-2">프로젝트명</label>
+        <input type="text" id="new-project-name" class="w-full bg-white/60 border border-white/40 rounded-lg px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="프로젝트 이름" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-on-background mb-2">설명</label>
+        <textarea id="new-project-desc" class="w-full bg-white/60 border border-white/40 rounded-lg px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none" rows="3" placeholder="프로젝트 설명"></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button onclick="closeModal()" class="flex-1 px-4 py-2 rounded-lg text-slate-600 hover:bg-white/40 transition-colors">취소</button>
+        <button onclick="saveNewProject()" class="flex-1 px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90 transition-all">생성</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let projects = [];
+    let currentProject = null;
+
+    // 프로젝트 데이터 로드
+    function loadProjects() {
+      try {
+        const saved = localStorage.getItem('nova_projects');
+        projects = saved ? JSON.parse(saved) : [];
+      } catch (error) {
+        console.error('프로젝트 로드 실패:', error);
+        projects = [];
+      }
+      renderProjects();
+    }
+
+    // 프로젝트 저장
+    function saveProjects() {
+      localStorage.setItem('nova_projects', JSON.stringify(projects));
+    }
+
+    // 프로젝트 렌더링
+    function renderProjects() {
+      const container = document.getElementById('projects-container');
+      const favContainer = document.getElementById('favorites-container');
+      const recentContainer = document.getElementById('recent-container');
+      
+      container.innerHTML = '';
+      favContainer.innerHTML = '';
+      recentContainer.innerHTML = '';
+
+      const favorites = projects.filter(p => p.isFavorite);
+      const recent = projects.sort((a, b) => new Date(b.modified) - new Date(a.modified)).slice(0, 3);
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+      // Favorites
+      favorites.forEach(project => {
+        if (project.name.toLowerCase().includes(searchTerm)) {
+          favContainer.appendChild(createProjectItem(project));
+        }
+      });
+
+      // Recent
+      recent.forEach(project => {
+        if (project.name.toLowerCase().includes(searchTerm) && !project.isFavorite) {
+          recentContainer.appendChild(createProjectItem(project));
+        }
+      });
+
+      // All Projects
+      projects.forEach(project => {
+        if (project.name.toLowerCase().includes(searchTerm) && !project.isFavorite) {
+          container.appendChild(createProjectItem(project));
+        }
+      });
+    }
+
+    // 프로젝트 아이템 생성
+    function createProjectItem(project) {
+      const div = document.createElement('div');
+      div.className = `sidebar-item cursor-pointer px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${currentProject?.id === project.id ? 'active' : ''}`;
+      div.innerHTML = `
+        <span class="material-symbols-outlined text-lg">folder</span>
+        <span class="flex-1 truncate">${project.name}</span>
+        <span class="material-symbols-outlined text-sm text-slate-400" onclick="event.stopPropagation(); toggleFav('${project.id}')">${project.isFavorite ? 'star' : 'star_border'}</span>
+      `;
+      div.onclick = () => selectProject(project);
+      return div;
+    }
+
+    // 프로젝트 선택
+    function selectProject(project) {
+      currentProject = project;
+      project.lastViewed = new Date().toISOString();
+      saveProjects();
+      displayProjectDetail(project);
+      renderProjects();
+    }
+
+    // 프로젝트 상세 정보 표시
+    function displayProjectDetail(project) {
+      document.getElementById('empty-state').classList.add('hidden');
+      document.getElementById('project-detail').classList.remove('hidden');
+
+      document.getElementById('project-name').textContent = project.name;
+      document.getElementById('project-desc').textContent = project.description || '설명 없음';
+      document.getElementById('project-created').textContent = new Date(project.created).toLocaleDateString('ko-KR');
+      document.getElementById('project-modified').textContent = new Date(project.modified).toLocaleDateString('ko-KR');
+      document.getElementById('project-files').textContent = (project.files || []).length;
+
+      // Favorite button
+      const favBtn = document.getElementById('favorite-btn');
+      const favIcon = document.getElementById('favorite-icon');
+      if (project.isFavorite) {
+        favIcon.textContent = 'star';
+        favIcon.style.color = '#fbbf24';
+      } else {
+        favIcon.textContent = 'star_border';
+        favIcon.style.color = '';
+      }
+
+      // Chat History
+      const chatHistory = document.getElementById('chat-history');
+      chatHistory.innerHTML = (project.chatHistory || []).length > 0 
+        ? (project.chatHistory || []).map((chat, idx) => `
+          <div class="p-3 bg-white/30 rounded-lg text-sm">
+            <p class="font-medium text-on-background truncate">${chat.title}</p>
+            <p class="text-xs text-slate-500 mt-1">${new Date(chat.date).toLocaleString('ko-KR')}</p>
+          </div>
+        `).join('')
+        : '<p class="text-slate-500 text-sm">채팅 히스토리 없음</p>';
+
+      // Related Files
+      const filesList = document.getElementById('related-files');
+      filesList.innerHTML = (project.files || []).length > 0 
+        ? (project.files || []).map(file => `
+          <div class="p-3 bg-white/30 rounded-lg text-sm flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">description</span>
+            <span class="flex-1 truncate font-medium">${file}</span>
+          </div>
+        `).join('')
+        : '<p class="text-slate-500 text-sm">파일 없음</p>';
+    }
+
+    // 새 프로젝트 생성
+    function createNewProject() {
+      document.getElementById('project-modal').classList.remove('hidden');
+      document.getElementById('new-project-name').focus();
+    }
+
+    function saveNewProject() {
+      const name = document.getElementById('new-project-name').value.trim();
+      const desc = document.getElementById('new-project-desc').value.trim();
+
+      if (!name) {
+        alert('프로젝트명을 입력하세요');
+        return;
+      }
+
+      const newProject = {
+        id: 'proj_' + Date.now(),
+        name: name,
+        description: desc,
+        created: new Date().toISOString(),
+        modified: new Date().toISOString(),
+        isFavorite: false,
+        chatHistory: [],
+        files: [],
+        lastViewed: new Date().toISOString()
+      };
+
+      projects.push(newProject);
+      saveProjects();
+      closeModal();
+      selectProject(newProject);
+    }
+
+    function closeModal() {
+      document.getElementById('project-modal').classList.add('hidden');
+      document.getElementById('new-project-name').value = '';
+      document.getElementById('new-project-desc').value = '';
+    }
+
+    // 즐겨찾기 토글
+    function toggleFav(projectId) {
+      const project = projects.find(p => p.id === projectId);
+      if (project) {
+        project.isFavorite = !project.isFavorite;
+        saveProjects();
+        renderProjects();
+      }
+    }
+
+    function toggleFavorite() {
+      if (currentProject) {
+        currentProject.isFavorite = !currentProject.isFavorite;
+        saveProjects();
+        renderProjects();
+        displayProjectDetail(currentProject);
+      }
+    }
+
+    // 프로젝트 삭제
+    function deleteProject() {
+      if (!currentProject) return;
+      if (confirm(`"${currentProject.name}" 프로젝트를 삭제하시겠습니까?`)) {
+        projects = projects.filter(p => p.id !== currentProject.id);
+        currentProject = null;
+        saveProjects();
+        document.getElementById('project-detail').classList.add('hidden');
+        document.getElementById('empty-state').classList.remove('hidden');
+        renderProjects();
+      }
+    }
+
+    // 프로젝트 필터링
+    function filterProjects() {
+      renderProjects();
+    }
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', loadProjects);
+    
+    // Modal 바깥 클릭 시 닫기
+    document.getElementById('project-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'project-modal') {
+        closeModal();
+      }
+    });
+
+    // 엔터키로 프로젝트 생성
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !document.getElementById('project-modal').classList.contains('hidden')) {
+        saveNewProject();
+      }
+    });
+  </script>
+</body>
+</html>
